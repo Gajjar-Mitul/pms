@@ -17,10 +17,10 @@
                             ->addIndexColumn()
                             ->addColumn('action', function($data){
                                 return ' <div class="btn-group btn-sm">
-                                                <a href="" class="btn btn-default btn-xs">
+                                                <a href="'.route('projects.view', ['id' => base64_encode($data->id)]).'" class="btn btn-default btn-xs">
                                                     <i class="fa fa-eye"></i>
                                                 </a> 
-                                                <a href="" class="btn btn-default btn-xs">
+                                                <a href="'.route('projects.edit', ['id' => base64_encode($data->id)]).'" class="btn btn-default btn-xs">
                                                     <i class="fa fa-edit"></i>
                                                 </a> 
                                                 <a href="javascript:;" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
@@ -102,158 +102,82 @@
         /** insert */
 
         /** edit */
-            public function edit(Request $request, $id=''){
-                if($id == '')
-                    return redirect()->back()->with('error', 'Something went wrong');
+            public function edit(Request $request){
+                
+                $id = base64_decode($request->id);
 
-                $id = base64_decode($id);
-
-                $path = URL('/uploads/inventory').'/';
-                $generate = $this->generate($id);
-                if($generate){
-                    $data = Inventory::select('id', 'title', 'qrcode', 'description',
-                                            DB::Raw("CASE
-                                                WHEN ".'file'." != '' THEN CONCAT("."'".$path."'".", ".'file'.")
-                                                ELSE CONCAT("."'".$path."'".", 'default.png')
-                                                END as image"))
+                if($id){
+                    $data = Project::select('id', 'title', 'client_name', 'description','budget' ,'deadline')
                                     ->where(['id' => $id])
                                     ->first();
                 
                     if($data){
-                        $details = InventoryDetail::
-                                                    select('id', 'name', 'quantity')
-                                                    ->where(['inventory_id' => $data->id])
-                                                    ->get();
-
-                        if($details->isNotEmpty())
-                            $data->details = $details;
-                        else
-                            $data->details = collect();
-
-                        return view('inventory.edit', ['data' => $data]);
+                        return view('project.edit', ['data' => $data]);
                     }else{
-                        return redirect()->back()->with('error', 'No inventory found');
+                        return redirect()->back()->with('error', 'No Project Found!');
                     }
                 }else{
-                    return redirect()->back()->with('error', 'Something went wrong');
+                    return redirect()->back()->with('error', 'Something went wrong!');
                 }
                 
             }
         /** edit */ 
 
         /** update */
-            public function update(InventoryRequest $request){
+            public function update(ProjectRequest $request){
                 if($request->ajax()){ return true; }
 
-                $exst_rec = Inventory::where(['id' => $request->id])->first();
+                $exst_rec = Project::where(['id' => $request->id])->first();
                 
                 if(!empty($request->all())){
                     $crud = [
                             'title' => ucfirst($request->title),
+                            'client_name' => $request->client_name ?? NULL,
                             'description' => $request->description ?? NULL,
+                            'budget' => $request->budget ?? NULL,
+                            'deadline' => date('Y-m-d',strtotime($request->deadline)) ?? NULL,
                             'updated_at' => date('Y-m-d H:i:s'),
                             'updated_by' => auth()->user()->id
                     ];
 
-                    if(!empty($request->file('image'))){
-                        $file = $request->file('image');
-                        $filenameWithExtension = $request->file('image')->getClientOriginalName();
-                        $filename = pathinfo($filenameWithExtension, PATHINFO_FILENAME);
-                        $extension = $request->file('image')->getClientOriginalExtension();
-                        $filenameToStore = time()."_".$filename.'.'.$extension;
-
-                        $folder_to_upload = public_path().'/uploads/inventory/';
-
-                        if (!\File::exists($folder_to_upload)) {
-                            \File::makeDirectory($folder_to_upload, 0777, true, true);
-                        }
-
-                        $crud["file"] = $filenameToStore;
-                    }else{
-                        $crud["file"] = $exst_rec->file;
-                    }
-
                     DB::beginTransaction();
                     try {
-                        $update = Inventory::where(['id' => $request->id])->update($crud);
-                    
+                        DB::enableQueryLog();
+                        $update = Project::where(['id' => $request->id])->update($crud);
+                        // dd(DB::getQueryLog());
                         if($update){
-                            if(!empty($request->file('image'))){
-                                $file->move($folder_to_upload, $filenameToStore);
-                            }
-                            $name = $request->name;
-                            $quantity = $request->quantity;
-
-                            for($i=0; $i<count($name); $i++){
-                                $exst_detail = InventoryDetail::select('id')->where(['inventory_id' => $request->id, 'name' => $name[$i]])->first();
-
-                                if(!empty($exst_detail)){
-                                    $detail_crud = [
-                                            'inventory_id' => $request->id,
-                                            'name' => $name[$i],
-                                            'quantity' => $quantity[$i],
-                                            'updated_at' => date('Y-m-d H:i:s'),
-                                            'updated_by' => auth()->user()->id
-                                    ];
-
-                                    InventoryDetail::where(['id' => $exst_detail->id])->update($detail_crud);
-                                }else{
-                                    $detail_crud = [
-                                            'inventory_id' => $request->id,
-                                            'name' => $name[$i],
-                                            'quantity' => $quantity[$i],
-                                            'created_at' => date('Y-m-d H:i:s'),
-                                            'created_by' => auth()->user()->id,
-                                            'updated_at' => date('Y-m-d H:i:s'),
-                                            'updated_by' => auth()->user()->id
-                                    ];
-
-                                    InventoryDetail::insertGetId($detail_crud);
-                                }
-                            }
-
                             DB::commit();
-                            return redirect()->route('inventories')->with('success', 'inventory updated successfully.');
+                            return redirect()->route('projects')->with('success', 'Project updated successfully.');
                         }else{
                             DB::rollback();
-                            return redirect()->back()->with('error', 'Faild to update inventory!')->withInput();
+                            return redirect()->back()->with('error', 'Faild to update Project!')->withInput();
                         }
                     } catch (\Exception $e) {
                         DB::rollback();
-                        return redirect()->back()->with('error', 'Faild to update inventory!')->withInput();
+                        return redirect()->back()->with('error', 'Faild to update Projects!')->withInput();
                     }
                 }else{
-                    return redirect()->back()->with('error', 'Something went wrong')->withInput();
+                    return redirect()->back()->with('error', 'Something went wrong!')->withInput();
                 }
             }
         /** update */
 
         /** view */
             public function view(Request $request, $id=''){
-                if($id == '')
-                    return redirect()->back()->with('error', 'Something went wrong');
+                $id = base64_decode($request->id);
 
-                $id = base64_decode($id);
-
-                $generate = $this->generate($id);
-
-                if($generate){
-                    $data = Inventory::select('id', 'title', 'qrcode', 'description')->where(['id' => $id])->first();
+                if($id){
+                    $data = Project::select('id', 'title', 'client_name', 'description','budget' ,'deadline')
+                                    ->where(['id' => $id])
+                                    ->first();
                 
                     if($data){
-                        $details = InventoryDetail::select('id', 'name', 'quantity')->where(['inventory_id' => $data->id])->get();
-
-                        if($details->isNotEmpty())
-                            $data->details = $details;
-                        else
-                            $data->details = collect();
-
-                        return view('inventory.view', ['data' => $data]);
+                        return view('project.view', ['data' => $data]);
                     }else{
-                        return redirect()->back()->with('error', 'No inventory found');
+                        return redirect()->back()->with('error', 'No Project Found!');
                     }
                 }else{
-                    return redirect()->back()->with('error', 'Something went wrong');
+                    return redirect()->back()->with('error', 'Something went wrong!');
                 }
                     
             }

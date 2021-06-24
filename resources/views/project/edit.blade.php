@@ -4,10 +4,11 @@
 @endsection
 
 @section('title')
-    Edit Product
+    Edit Project
 @endsection
 
 @section('styles')
+    <link href="{{ asset('/assets/vendors/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -16,50 +17,47 @@
             <div class="col-md-12">
                 <div class="ibox">
                     <div class="ibox-head">
-                        <div class="ibox-title">Edit Product</div>
+                        <div class="ibox-title">Edit Project</div>
                     </div>
                     <div class="ibox-body">
-                        <form name="form" action="{{ route('products.update') }}" id="form" method="post" enctype="multipart/form-data">
+                        <form name="form" action="{{ route('projects.update') }}" id="form" method="post" enctype="multipart/form-data">
                             @csrf
-                            @method('PATCH')
-
-                            <input type="hidden" name="id" value="{{ $data->id }}">
                             
+                            <input type="hidden" name="id" value="{{ $data->id }}">
                             <div class="row">
                                 <div class="form-group col-sm-6">
-                                    <label for="name">Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="name" id="name" class="form-control" value="{{ @old('name', $data->name) }}" placeholder="Plese enter name" />
-                                    <span class="kt-form__help error name"></span>
+                                    <label for="title">Title <span class="text-danger">*</span></label>
+                                    <input type="text" name="title" id="title" class="form-control" placeholder="Plese enter title" value="{{ $data->title ?? '' }}" />
+                                    <span class="kt-form__help error title"></span>
                                 </div>
                                 <div class="form-group col-sm-6">
-                                    <label for="quantity">Quantity <span class="text-danger">*</span></label>
-                                    <input type="text" name="quantity" id="quantity" class="form-control digits" value="{{ @old('quantity', $data->quantity) }}" placeholder="Plese enter quantity" />
-                                    <span class="kt-form__help error quantity"></span>
+                                    <label for="client_name">Client Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="client_name" id="client_name" class="form-control digits" placeholder="Plese enter Client Name" value="{{ $data->client_name ?? '' }}" />
+                                    <span class="kt-form__help error client_name"></span>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label for="description">Description <span class="text-danger">*</span></label>
+                                    <textarea type="text" name="description" id="description" class="form-control" placeholder="Plese enter description">{{ $data->description ??'' }}</textarea>
+                                    <span class="kt-form__help error description"></span>
                                 </div>
                                 <div class="form-group col-sm-6">
-                                    <label for="unit">Unit <span class="text-danger">*</span></label>
-                                    <input type="text" name="unit" id="unit" class="form-control" value="{{ @old('unit', $data->unit) }}" placeholder="Plese enter unit" />
-                                    <span class="kt-form__help error unit"></span>
+                                    <label for="budget">Budget <span class="text-danger">*</span></label>
+                                    <input type="text" name="budget" id="budget" class="form-control" placeholder="Plese enter budget" value="{{ $data->budget ?? '' }}" />
+                                    <span class="kt-form__help error budget"></span>
                                 </div>
-                                <div class="form-group col-sm-6">
-                                    <label for="color">Color <span class="text-danger">*</span></label>
-                                    <input type="text" name="color" id="color" class="form-control" value="{{ @old('color', $data->color) }}" placeholder="Plese enter color" />
-                                    <span class="kt-form__help error color"></span>
+                                <div class="form-group col-sm-6" id="date_1">
+                                    <label for="deadline">DeadLine <span class="text-danger">*</span></label>
+                                    <div class="input-group date">
+                                        <span class="input-group-addon bg-white"><i class="fa fa-calendar"></i></span>
+                                        <input class="form-control" name="deadline" type="text" value="{{ $data->deadline ?? '' }}">
+                                    </div>
+                                    <span class="kt-form__help error deadline"></span>
                                 </div>
-                                <div class="form-group col-sm-6">
-                                    <label for="price">Price <span class="text-danger">*</span></label>
-                                    <input type="text" name="price" id="price" class="form-control digits" value="{{ @old('price', $data->price) }}" placeholder="Plese enter price" />
-                                    <span class="kt-form__help error price"></span>
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label for="note">Note <span class="text-danger"></span></label>
-                                    <input type="text" name="note" id="note" class="form-control" value="{{ @old('note', $data->note) }}" placeholder="Plese enter note" />
-                                    <span class="kt-form__help error note"></span>
-                                </div>
+                              
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Submit</button>
-                                <a href="{{ route('products') }}" class="btn btn-default">Back</a>
+                                <a href="{{ route('projects') }}" class="btn btn-default">Back</a>
                             </div>
                         </form>
                     </div>
@@ -70,9 +68,10 @@
 @endsection
 
 @section('scripts')
+    <script src="{{ asset('assets/vendors/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script>
         $(document).ready(function () {
-            $('.digits').keyup(function(e){
+            $('.budget').keyup(function(e){
                 if (/\D/g.test(this.value)){
                     this.value = this.value.replace(/\D/g, '');
                 }

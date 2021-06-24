@@ -22,6 +22,9 @@ Route::group(['middleware' => ['prevent-back-history']], function(){
             Route::any('projects', 'ProjectController@index')->name('projects');
             Route::get('projects/create', 'ProjectController@create')->name('projects.create');
             Route::post('projects/insert', 'ProjectController@insert')->name('projects.insert');
+            Route::get('projects/edit', 'ProjectController@edit')->name('projects.edit');
+            Route::post('projects/update', 'ProjectController@update')->name('projects.update');
+            Route::get('projects/view', 'ProjectController@view')->name('projects.view');
         /** Projects */ 
     });
     Route::get("{path}", function(){ return redirect()->route('login'); })->where('path', '.+');

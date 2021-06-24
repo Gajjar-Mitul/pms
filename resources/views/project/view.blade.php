@@ -4,10 +4,11 @@
 @endsection
 
 @section('title')
-    View Product
+    View Project
 @endsection
 
 @section('styles')
+    <link href="{{ asset('/assets/vendors/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -16,44 +17,45 @@
             <div class="col-md-12">
                 <div class="ibox">
                     <div class="ibox-head">
-                        <div class="ibox-title">View Product</div>
+                        <div class="ibox-title">View Project</div>
                     </div>
                     <div class="ibox-body">
-                        <div class="row">
-                            <div class="form-group col-sm-6">
-                                <label for="name">Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" id="name" class="form-control" value="{{ $data->name ?? '' }}" placeholder="Plese enter name" disabled />
-                                <span class="kt-form__help error name"></span>
+                        <form name="form" id="form" method="post" enctype="multipart/form-data">
+                            @csrf
+                            
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label for="title">Title <span class="text-danger">*</span></label>
+                                    <input type="text" name="title" id="title" class="form-control" placeholder="Plese enter title" value="{{ $data->title ?? '' }}" disabled />
+
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label for="client_name">Client Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="client_name" id="client_name" class="form-control digits" placeholder="Plese enter Client Name" value="{{ $data->client_name ?? '' }}" disabled="" />
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label for="description">Description <span class="text-danger">*</span></label>
+                                    <textarea type="text" name="description" id="description" class="form-control" placeholder="Plese enter description" disabled="">{{ $data->description ??'' }}</textarea>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label for="budget">Budget <span class="text-danger">*</span></label>
+                                    <input type="text" name="budget" id="budget" class="form-control" placeholder="Plese enter budget" value="{{ $data->budget ?? '' }}" disabled="" />
+
+                                </div>
+                                <div class="form-group col-sm-6" id="date_1">
+                                    <label for="deadline">DeadLine <span class="text-danger">*</span></label>
+                                    <div class="input-group date">
+                                        <span class="input-group-addon bg-white"><i class="fa fa-calendar"></i></span>
+                                        <input class="form-control" name="deadline" type="text" value="{{ $data->deadline ?? '' }}" disabled="">
+                                    </div>
+                                    <span class="kt-form__help error deadline"></span>
+                                </div>
+                              
                             </div>
-                            <div class="form-group col-sm-6">
-                                <label for="quantity">Quantity <span class="text-danger">*</span></label>
-                                <input type="text" name="quantity" id="quantity" class="form-control digits" value="{{ $data->quantity ?? '' }}" placeholder="Plese enter quantity" disabled />
-                                <span class="kt-form__help error quantity"></span>
+                            <div class="form-group">
+                                <a href="{{ route('projects') }}" class="btn btn-default">Back</a>
                             </div>
-                            <div class="form-group col-sm-6">
-                                <label for="unit">Unit <span class="text-danger">*</span></label>
-                                <input type="text" name="unit" id="unit" class="form-control" value="{{ $data->unit ?? '' }}" placeholder="Plese enter unit" disabled />
-                                <span class="kt-form__help error unit"></span>
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="color">Color <span class="text-danger">*</span></label>
-                                <input type="text" name="color" id="color" class="form-control" value="{{ $data->color ?? '' }}" placeholder="Plese enter color" disabled />
-                                <span class="kt-form__help error color"></span>
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="price">Price <span class="text-danger">*</span></label>
-                                <input type="text" name="price" id="price" class="form-control digits" value="{{ $data->price ?? '' }}" placeholder="Plese enter price" disabled />
-                                <span class="kt-form__help error price"></span>
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="note">Note <span class="text-danger"></span></label>
-                                <input type="text" name="note" id="note" class="form-control" value="{{ $data->note ?? '' }}" placeholder="Plese enter note" disabled />
-                                <span class="kt-form__help error note"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <a href="{{ route('products') }}" class="btn btn-default">Back</a>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -62,5 +64,46 @@
 @endsection
 
 @section('scripts')
+    <script src="{{ asset('assets/vendors/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $('.budget').keyup(function(e){
+                if (/\D/g.test(this.value)){
+                    this.value = this.value.replace(/\D/g, '');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            var form = $('#form');
+            $('.kt-form__help').html('');
+            form.submit(function(e) {
+                $('.help-block').html('');
+                $('.m-form__help').html('');
+                $.ajax({
+                    url : form.attr('action'),
+                    type : form.attr('method'),
+                    data : form.serialize(),
+                    dataType: 'json',
+                    async:false,
+                    success : function(json){
+                        return true;
+                    },
+                    error: function(json){
+                        if(json.status === 422) {
+                            e.preventDefault();
+                            var errors_ = json.responseJSON;
+                            $('.kt-form__help').html('');
+                            $.each(errors_.errors, function (key, value) {
+                                $('.'+key).html(value);
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
 
