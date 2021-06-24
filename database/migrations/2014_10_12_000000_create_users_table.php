@@ -22,7 +22,6 @@ class CreateUsersTable extends Migration
             $table->string('password')->nullable();
             $table->enum('is_admin', ['y', 'n'])->default('n');
             $table->enum('status', ['active', 'inactive', 'deleted'])->default('inactive');
-            $table->rememberToken();
             $table->timestamps();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();

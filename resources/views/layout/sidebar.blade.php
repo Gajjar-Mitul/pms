@@ -21,6 +21,13 @@
                     <span class="nav-label">Dashboard</span>
                 </a>
             </li>
+
+            <li class="{{ Request::is('projects*') ? 'active' : '' }}">
+                <a class="{{ Request::is('projects*') ? 'active' : '' }}" href="{{ route('projects') }}"><i class="sidebar-item-icon fa fa-th-large"></i>
+                    <span class="nav-label">Projects</span>
+                </a>
+            </li>
+
         </ul>
     </div>
 </nav>

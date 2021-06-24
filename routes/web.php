@@ -17,6 +17,12 @@ Route::group(['middleware' => ['prevent-back-history']], function(){
         Route::get('logout', 'AuthController@logout')->name('logout');
 
         Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
+        
+        /** Projects */ 
+            Route::any('projects', 'ProjectController@index')->name('projects');
+            Route::get('projects/create', 'ProjectController@create')->name('projects.create');
+            Route::post('projects/insert', 'ProjectController@insert')->name('projects.insert');
+        /** Projects */ 
     });
     Route::get("{path}", function(){ return redirect()->route('login'); })->where('path', '.+');
 });

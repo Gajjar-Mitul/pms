@@ -53,7 +53,6 @@
 
         public function password_forget(Request $request){
             $user = DB::table('users')->where(['email' => $request->email])->first();
-
             if(!isset($user) && $user == null) {
                 return redirect()->back()->with('error' , 'Entered email address does not exists in records, please check email address');
             }
@@ -67,10 +66,11 @@
                 'created_at' => date('Y-m-d H:i:s')
             ]);
 
-            $mailData = array('from_email' => 'gajjarmitul007@gmail.com', 'email' => $request->email, 'link' => $link);
+            $mailData = array('from_email' => 'info@cypherocean.com', 'email' => $request->email, 'link' => $link);
             
             try{
                 Mail::to($request->email)->send(new ForgetPassword($mailData));
+            // dd($link);
 
                 return redirect()->route('login')->with('Success', 'please check your email and follow steps for reset password');
             }catch(\Exception $e){
