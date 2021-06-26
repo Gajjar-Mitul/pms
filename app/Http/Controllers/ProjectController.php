@@ -27,6 +27,7 @@
                                                     <i class="fa fa-bars"></i>
                                                 </a> 
                                                 <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="'.route('projects.milestone',['id' => base64_encode($data->id)]).'">Milestones</a></li>
                                                     <li><a class="dropdown-item" href="javascript:;" onclick="change_status(this);" data-status="active" data-old_status="'.$data->status.'" data-id="'.base64_encode($data->id).'">Active</a></li>
                                                     <li><a class="dropdown-item" href="javascript:;" onclick="change_status(this);" data-status="inactive" data-old_status="'.$data->status.'" data-id="'.base64_encode($data->id).'">Inactive</a></li>
                                                     <li><a class="dropdown-item" href="javascript:;" onclick="change_status(this);" data-status="deleted" data-old_status="'.$data->status.'" data-id="'.base64_encode($data->id).'">Delete</a></li>
@@ -183,31 +184,6 @@
             }
         /** view */ 
 
-        /** delete-detail */
-            public function delete_detail(Request $request){
-                if(!$request->ajax()){ exit('No direct script access allowed'); }
-
-                if(!empty($request->all())){
-                    $id = $request->id;
-
-                    $data = InventoryDetail::where(['id' => $id])->first();
-
-                    if(!empty($data)){
-                        $update = InventoryDetail::where(['id' => $id])->delete();                        
-                        
-                        if($update)
-                            return response()->json(['code' => 200]);
-                        else
-                            return response()->json(['code' => 201]);
-                    }else{
-                        return response()->json(['code' => 201]);
-                    }
-                }else{
-                    return response()->json(['code' => 201]);
-                }
-            }
-        /** delete-detail */
-
         /** change-status */
             public function change_status(Request $request){
                 if(!$request->ajax()){ exit('No direct script access allowed'); }
@@ -251,129 +227,39 @@
             }
         /** change-status */
 
-        /** generate-qrcode */
-            public function generate($id=''){
-                if($id == '')
-                    return false;
+        /** MileStone */
+            public function milestone(Request $request){
+                $id = base64_decode($request->id);
 
-                $exst_file = public_path().'/uploads/qrcodes/qrcode_'.$id.'.png';
-                if(\File::exists($exst_file) && $exst_file != '')
-                    @unlink($exst_file);
-                
-                $qrname = 'qrcode_'.$id.'.png';
-
-                \QrCode::size(500)->format('png')->merge('/public/qr_logo.png', .3)->generate($id, public_path('uploads/qrcodes/'.$qrname));
-
-                $update = Inventory::where(['id' => $id])->update(['qrcode' => $qrname, 'updated_at' => date('Y-m-d H:i:s'), 'updated_by' => auth()->user()->id]);
-                
-                if($update)
-                    return true;
-                else
-                    return false;
-            }
-        /** generate-qrcode */
-
-        /** generate-item-qrcode */
-            public function generate_item($id=''){
-                if($id == '')
-                    return false;
-                $folder_to_uploads = public_path().'/uploads/qrcodes/item/';
-
-                if (!\File::exists($folder_to_uploads)) {
-                    \File::makeDirectory($folder_to_uploads, 0777, true, true);
-                }
-
-                $exst_file = public_path().'/uploads/qrcodes/item/qrcode_'.$id.'.png';
-                if(\File::exists($exst_file) && $exst_file != '')
-                    @unlink($exst_file);
-                
-                $qrname = 'qrcode_'.$id.'.png';
-
-                \QrCode::size(500)->format('png')->merge('/public/qr_logo.png', .3)->generate($id, public_path('uploads/qrcodes/item/'.$qrname));
-
-                $update = InventoryDetail::where(['id' => $id])->update(['qr_code' => $qrname, 'updated_at' => date('Y-m-d H:i:s'), 'updated_by' => auth()->user()->id]);
-                
-                if($update)
-                    return true;
-                else
-                    return false;
-            }
-        /** generate-item-qrcode */
-
-        /** print-qrcode */
-            public function print(Request $request, $id=''){
-                if($id == '')
-                    return redirect()->back()->with('error', 'something went wrong');
-
-                $id = base64_decode($id);
-                $generate = $this->generate($id);
-                if($generate){
-                    $data = Inventory::select('qrcode')->where(['id' => $id])->first();
-                
-                    if($data)
-                        return view('inventory.print', ['data' => $data]);
-                    else
-                        return redirect()->back()->with('error', 'Something went wrong');    
+                if($id){
+                    return view('project.milestone',['id' => $id]);
                 }else{
-                    return redirect()->back()->with('error', 'something went wrong');
+                    return redirect()->back()->with('error' , 'Something Went Wrong !');
                 }
-                
             }
-        /** print-qrcode */
 
-        /** print-item-qrcode */
-            public function print_item(Request $request, $id=''){
-                if($id == '')
-                    return redirect()->back()->with('error', 'something went wrong');
-                $id = base64_decode($id);
-                $generate = $this->generate_item($id);
+            public function milestone_edit(Request $request){
+                $id = $request->id;
 
-                if($generate){
-                    $data = InventoryDetail::select('qr_code')->where(['id' => $id])->first();
-                
-                    if($data)
-                        return view('inventory.printItem', ['data' => $data]);
-                    else
-                        return redirect()->back()->with('error', 'Something went wrong');    
-                }else{
-                    return redirect()->back()->with('error', 'something went wrong');
-                }                
-            }
-        /** print-item-qrcode */
+                if($id){
+                    for($i=0; $i<count($$request->name); $i++){
+                                $milestone_crud = [
+                                        'project_id' => $request->id,
+                                        'name' => $name[$i],
+                                        'amount' => $amount[$i],
+                                        'deadline' => date('Y-m-d' , strtotime($deadline[$i])),
+                                        'created_at' => date('Y-m-d H:i:s'),
+                                        'created_by' => auth()->user()->id,
+                                        'updated_at' => date('Y-m-d H:i:s'),
+                                        'updated_by' => auth()->user()->id
+                                ];
 
-        /** profile remove */
-            public function profile_remove(Request $request){
-                if(!$request->ajax()){ exit('No direct script access allowed'); }
-
-                if(!empty($request->all())){
-                    $id = base64_decode($request->id);
-                    $data = DB::table('inventories')->find($id);
-
-                    if($data){
-                        if($data->file != ''){
-                            $file_path = public_path().'/uploads/inventory/'.$data->file;
-
-                            if(File::exists($file_path) && $file_path != ''){
-                                if($data->file != 'default.png'){
-                                    unlink($file_path);
-                                }
+                                MileStone::insertGetId($milestone_crud);
                             }
 
-                            $update = DB::table('inventories')->where(['id' => $id])->limit(1)->update(['file' => null]);
-
-                            if($update)
-                                return response()->json(['code' => 200]);
-                            else
-                                return response()->json(['code' => 201]);
-                        }else{
-                            return response()->json(['code' => 200]);
-                        }
-                    }else{
-                        return response()->json(['code' => 201]);
-                    }
                 }else{
-                    return response()->json(['code' => 201]);
+                    return redirect()->back()->with('error' , 'Something Went Wrong !');
                 }
             }
-        /** profile remove */
+        /** MileStone */ 
     }

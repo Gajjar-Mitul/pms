@@ -25,6 +25,8 @@ Route::group(['middleware' => ['prevent-back-history']], function(){
             Route::get('projects/edit', 'ProjectController@edit')->name('projects.edit');
             Route::post('projects/update', 'ProjectController@update')->name('projects.update');
             Route::get('projects/view', 'ProjectController@view')->name('projects.view');
+            Route::get('projects/milestone', 'ProjectController@milestone')->name('projects.milestone');
+            Route::post('projects/milestone_edit', 'ProjectController@milestone_edit')->name('projects.milestone_edit');
         /** Projects */ 
     });
     Route::get("{path}", function(){ return redirect()->route('login'); })->where('path', '.+');
