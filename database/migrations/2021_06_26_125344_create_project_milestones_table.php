@@ -18,6 +18,7 @@ class CreateProjectMilestonesTable extends Migration
             $table->integer('project_id')->nullable();
             $table->string('name')->nullable();
             $table->string('amount')->nullable();
+            $table->text('description')->nullable();
             $table->date('deadline')->nullable();
             $table->enum('status', ['pending','complate'])->default('pending');
             $table->timestamps();

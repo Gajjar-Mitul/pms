@@ -20,9 +20,9 @@
                         <div class="ibox-title">Create MileStones</div>
                     </div>
                     <div class="ibox-body">
-                        <form name="form" action="{{ route('projects.milestone_edit') }}" id="form" method="post" enctype="multipart/form-data">
+                        <form name="form" action="{{ route('milestones.insert') }}" id="form" method="post" enctype="multipart/form-data">
                             @csrf
-                            <input type="hidden" name="id" value="{{ $id }}">
+                            <input type="hidden" name="id" value="{{ base64_decode($id) }}">
                             <div class="row">
                                 <div class="form-group col-sm-6">
                                     <label for="name">Name <span class="text-danger">*</span></label>
@@ -64,7 +64,7 @@
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Submit</button>
-                                <a href="{{ route('projects') }}" class="btn btn-default">Back</a>
+                                <a href="{{ route('milestones' ,['id' => base64_encode($id)]) }}" class="btn btn-default">Back</a>
                             </div>
                         </form>
                     </div>

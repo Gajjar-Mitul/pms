@@ -4,14 +4,15 @@
 
     use Illuminate\Http\Request;
     use App\Models\Project;
-    use App\Http\Requests\ProjectRequest;
+    use App\Models\Milestone;
+    use App\Http\Requests\MilestoneRequest;
     use Auth, Validator, File, DB, DataTables;
 
-    class ProjectController extends Controller{
+    class MilestoneController extends Controller{
         /** index */
             public function index(Request $request){
                 if($request->ajax()){
-                    $data = Project::select('id', 'title', 'client_name', 'budget','deadline' ,'status')->get();
+                    $data = Milestone::select('id', 'name' ,'description', 'amount', 'project_id','deadline' ,'status')->get();
 
                     return Datatables::of($data)
                             ->addIndexColumn()
@@ -27,7 +28,7 @@
                                                     <i class="fa fa-bars"></i>
                                                 </a> 
                                                 <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="'.route('milestones',['id' => base64_encode($data->id)]).'">Milestones</a></li>
+
                                                     <li><a class="dropdown-item" href="javascript:;" onclick="change_status(this);" data-status="active" data-old_status="'.$data->status.'" data-id="'.base64_encode($data->id).'">Active</a></li>
                                                     <li><a class="dropdown-item" href="javascript:;" onclick="change_status(this);" data-status="inactive" data-old_status="'.$data->status.'" data-id="'.base64_encode($data->id).'">Inactive</a></li>
                                                     <li><a class="dropdown-item" href="javascript:;" onclick="change_status(this);" data-status="deleted" data-old_status="'.$data->status.'" data-id="'.base64_encode($data->id).'">Delete</a></li>
@@ -52,52 +53,55 @@
                             ->make(true);
                 }
 
-                return view('project.index');
+                return view('milestone.index')->with('id' ,$request->id);
             }
         /** index */
 
         /** create */
             public function create(Request $request){
-                return view('project.create');
+                return view('milestone.create')->with('id' ,$request->id);
             }
         /** create */
 
         /** insert */
-            public function insert(ProjectRequest $request){
+            public function insert(MilestoneRequest $request){
                 if($request->ajax()){ return true; }
 
                 if(!empty($request->all())){
-                    $crud = [
-                            'title' => ucfirst($request->title),
-                            'client_name' => $request->client_name,
-                            'description' => $request->description,
-                            'budget' => $request->budget,
-                            'deadline' => date('Y-m-d',strtotime($request->deadline)),
-                            'payment' => 'pending',
-                            'status' => 'pending',
-                            'created_at' => date('Y-m-d H:i:s'),
-                            'created_by' => auth()->user()->id,
-                            'updated_at' => date('Y-m-d H:i:s'),
-                            'updated_by' => auth()->user()->id
-                    ];
+                    $name = $request->name;
+                    $amount = $request->amount;
+                    $deadline = $request->deadline;
+
+                    for($i=0; $i<count($name); $i++){
+                        $order_detail_crud = [
+                                'project_id' => $request->id,
+                                'name' => $name[$i],
+                                'amount' => $amount[$i],
+                                'deadline' => $deadline[$i],
+                                'created_at' => date('Y-m-d H:i:s'),
+                                'created_by' => auth()->user()->id,
+                                'updated_at' => date('Y-m-d H:i:s'),
+                                'updated_by' => auth()->user()->id
+                        ];
+
+                    }
 
                     DB::beginTransaction();
                     try {
-                        $last_id = Project::insertGetId($crud);
-                        
+                       $last_id = MileStone::insertGetId($order_detail_crud);
                         if($last_id){
                             DB::commit();
-                            return redirect()->route('projects')->with('success', 'Project created successfully.');
+                            return redirect()->route('milestones' ,['id' => base64_encode($request->id)])->with('success', 'Milestone created successfully.');
                         }else{
                             DB::rollback();
-                            return redirect()->back()->with('error', 'Faild to create Project!')->withInput();
+                            return redirect()->back()->with('error', 'Faild to create Milestone!')->withInput();
                         }
                     } catch (\Exception $e) {
                         DB::rollback();
-                        return redirect()->back()->with('error', 'Faild to create Project!')->withInput();
+                        return redirect()->back()->with('error', 'Somthing Went Wrong!')->withInput();
                     }
                 }else{
-                    return redirect()->back()->with('error', 'Something went wrong')->withInput();
+                    return redirect()->back()->with('error', 'Field Are Require')->withInput();
                 }
             }
         /** insert */
@@ -226,40 +230,4 @@
                 }
             }
         /** change-status */
-
-        /** MileStone */
-            public function milestone(Request $request){
-                $id = base64_decode($request->id);
-
-                if($id){
-                    return view('milestones',['id' => $id]);
-                }else{
-                    return redirect()->back()->with('error' , 'Something Went Wrong !');
-                }
-            }
-
-            public function milestone_edit(Request $request){
-                $id = $request->id;
-
-                if($id){
-                    for($i=0; $i<count($$request->name); $i++){
-                                $milestone_crud = [
-                                        'project_id' => $request->id,
-                                        'name' => $name[$i],
-                                        'amount' => $amount[$i],
-                                        'deadline' => date('Y-m-d' , strtotime($deadline[$i])),
-                                        'created_at' => date('Y-m-d H:i:s'),
-                                        'created_by' => auth()->user()->id,
-                                        'updated_at' => date('Y-m-d H:i:s'),
-                                        'updated_by' => auth()->user()->id
-                                ];
-
-                                MileStone::insertGetId($milestone_crud);
-                            }
-
-                }else{
-                    return redirect()->back()->with('error' , 'Something Went Wrong !');
-                }
-            }
-        /** MileStone */ 
     }

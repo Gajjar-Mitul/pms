@@ -17,7 +17,7 @@ class CreateProjectsTable extends Migration
             $table->id();
             $table->string('title')->nullable();
             $table->string('client_name')->nullable();
-            $table->text('description')->nullable();
+            $table->longtext('description')->nullable();
             $table->string('budget')->nullable();
             $table->date('deadline')->nullable();
             $table->enum('payment',['pending','complate'])->default('pending');
