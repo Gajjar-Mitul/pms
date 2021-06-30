@@ -4,7 +4,7 @@
 @endsection
 
 @section('title')
-    Edit Project
+    Create MileStones
 @endsection
 
 @section('styles')
@@ -17,47 +17,49 @@
             <div class="col-md-12">
                 <div class="ibox">
                     <div class="ibox-head">
-                        <div class="ibox-title">Edit Project</div>
+                        <div class="ibox-title">Create MileStones</div>
                     </div>
                     <div class="ibox-body">
-                        <form name="form" action="{{ route('projects.update') }}" id="form" method="post" enctype="multipart/form-data">
+                        <form name="form" action="{{ route('milestones.update') }}" id="form" method="post" enctype="multipart/form-data">
                             @csrf
-                            
+                            @method('PATCH')
                             <input type="hidden" name="id" value="{{ $data->id }}">
+                            <input type="hidden" name="project_id" value="{{ $data->project_id }}">
                             <div class="row">
+                                
                                 <div class="form-group col-sm-6">
-                                    <label for="title">Title <span class="text-danger">*</span></label>
-                                    <input type="text" name="title" id="title" class="form-control" placeholder="Plese enter title" value="{{ $data->title ?? '' }}" />
-                                    <span class="kt-form__help error title"></span>
+                                    <label for="name">Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" id="name" placeholder="Please Enter Name" class="form-control" value="{{ $data->name ??'' }}">
+                                    </select>
+                                    <span class="kt-form__help error name"></span>
                                 </div>
+
                                 <div class="form-group col-sm-6">
-                                    <label for="client_name">Client Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="client_name" id="client_name" class="form-control digits" placeholder="Plese enter Client Name" value="{{ $data->client_name ?? '' }}" />
-                                    <span class="kt-form__help error client_name"></span>
-                                </div>
-                                <div class="form-group col-sm-12">
                                     <label for="description">Description <span class="text-danger">*</span></label>
-                                    <textarea type="text" name="description" id="description" class="form-control" placeholder="Plese enter description">{{ $data->description ??'' }}</textarea>
+                                    <textarea ype="text" name="description" id="description" class="form-control" placeholder="Plese enter description">{{ $data->description??'' }}</textarea>
                                     <span class="kt-form__help error description"></span>
                                 </div>
+                                
                                 <div class="form-group col-sm-6">
-                                    <label for="budget">Budget <span class="text-danger">*</span></label>
-                                    <input type="text" name="budget" id="budget" class="form-control" placeholder="Plese enter budget" value="{{ $data->budget ?? '' }}" />
-                                    <span class="kt-form__help error budget"></span>
+                                    <label for="amount">Amount <span class="text-danger">*</span></label>
+                                    <input type="text" name="amount" id="amount" class="form-control digit" placeholder="Plese enter amount" value="{{ $data->amount ??'' }}"/>
+                                    <span class="kt-form__help error amount"></span>
                                 </div>
+                                
                                 <div class="form-group col-sm-6" id="date_1">
                                     <label for="deadline">DeadLine <span class="text-danger">*</span></label>
                                     <div class="input-group date">
                                         <span class="input-group-addon bg-white"><i class="fa fa-calendar"></i></span>
-                                        <input class="form-control" name="deadline" type="text" value="{{ $data->deadline ?? '' }}">
+                                        <input class="form-control" id="deadline" name="deadline" type="text" value="{{ $data->deadline ??Date('Y-m-d') }}">
                                     </div>
                                     <span class="kt-form__help error deadline"></span>
                                 </div>
-                              
+                                
                             </div>
+                                
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Submit</button>
-                                <a href="{{ route('projects') }}" class="btn btn-default">Back</a>
+                                <a href="{{ route('milestones' ,['id' => base64_encode($data->project_id)]) }}" class="btn btn-default">Back</a>
                             </div>
                         </form>
                     </div>
@@ -70,13 +72,15 @@
 @section('scripts')
     <script src="{{ asset('assets/vendors/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script>
-        $(document).ready(function () {
-            $('.budget').keyup(function(e){
-                if (/\D/g.test(this.value)){
-                    this.value = this.value.replace(/\D/g, '');
-                }
+        // Bootstrap datepicker
+            $('#date_1 .input-group.date').datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true,
+                format: 'yyyy-mm-dd'
             });
-        });
     </script>
 
     <script>

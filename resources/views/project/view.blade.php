@@ -9,6 +9,7 @@
 
 @section('styles')
     <link href="{{ asset('/assets/vendors/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendors/summernote/dist/summernote.css') }}" rel="stylesheet" />
 @endsection
 
 @section('content')
@@ -33,10 +34,6 @@
                                     <label for="client_name">Client Name <span class="text-danger">*</span></label>
                                     <input type="text" name="client_name" id="client_name" class="form-control digits" placeholder="Plese enter Client Name" value="{{ $data->client_name ?? '' }}" disabled="" />
                                 </div>
-                                <div class="form-group col-sm-12">
-                                    <label for="description">Description <span class="text-danger">*</span></label>
-                                    <textarea type="text" name="description" id="description" class="form-control" placeholder="Plese enter description" disabled="">{{ $data->description ??'' }}</textarea>
-                                </div>
                                 <div class="form-group col-sm-6">
                                     <label for="budget">Budget <span class="text-danger">*</span></label>
                                     <input type="text" name="budget" id="budget" class="form-control" placeholder="Plese enter budget" value="{{ $data->budget ?? '' }}" disabled="" />
@@ -51,6 +48,13 @@
                                     <span class="kt-form__help error deadline"></span>
                                 </div>
                               
+                                <div class="form-group col-sm-12">
+                                    <label for="description">Description <span class="text-danger">*</span></label>
+                                        <textarea id="summernote" name="description" data-plugin="summernote" data-air-mode="true" disabled="">
+                                            {{ $data->description ??'' }}
+                                        </textarea>
+                                </div>
+
                             </div>
                             <div class="form-group">
                                 <a href="{{ route('projects') }}" class="btn btn-default">Back</a>
@@ -65,6 +69,7 @@
 
 @section('scripts')
     <script src="{{ asset('assets/vendors/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+     <script src="{{ asset('assets/vendors/summernote/dist/summernote.min.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('.budget').keyup(function(e){
@@ -73,6 +78,10 @@
                 }
             });
         });
+        $(function() {
+            $('#summernote').summernote();
+        });
+
     </script>
 
     <script>

@@ -15,15 +15,17 @@ class CreateProjectMilestonesTable extends Migration
     {
         Schema::create('project_milestones', function (Blueprint $table) {
             $table->id();
-            $table->integer('project_id')->nullable();
+            $table->bigInteger('project_id')->nullable()->unsigned();
             $table->string('name')->nullable();
             $table->string('amount')->nullable();
             $table->text('description')->nullable();
             $table->date('deadline')->nullable();
-            $table->enum('status', ['pending','complate'])->default('pending');
+            $table->enum('payment_status', ['pending','complate'])->default('pending');
+            $table->enum('status', ['pending','w.i.p.','complate'])->default('pending');
             $table->timestamps();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

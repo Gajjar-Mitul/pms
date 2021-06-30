@@ -8,8 +8,9 @@
 @endsection
 
 @section('styles')
-     <link href="{{ asset('assets/vendors/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/vendors/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/vendors/bootstrap-timepicker/css/bootstrap-timepicker.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/vendors/summernote/dist/summernote.css') }}" rel="stylesheet" />
 
 @endsection
 
@@ -36,11 +37,6 @@
                                     <input type="text" name="client_name" id="client_name" class="form-control digits" placeholder="Plese enter Client Name" value="{{ @old('client_name') }}" />
                                     <span class="kt-form__help error client_name"></span>
                                 </div>
-                                <div class="form-group col-sm-12">
-                                    <label for="description">Description <span class="text-danger">*</span></label>
-                                    <textarea type="text" name="description" id="description" class="form-control" placeholder="Plese enter description" value="{{ @old('description') }}" ></textarea>
-                                    <span class="kt-form__help error description"></span>
-                                </div>
                                 <div class="form-group col-sm-6">
                                     <label for="budget">Budget <span class="text-danger">*</span></label>
                                     <input type="text" name="budget" id="budget" class="form-control" placeholder="Plese enter budget" value="{{ @old('budget') }}" />
@@ -55,6 +51,12 @@
                                     <span class="kt-form__help error deadline"></span>
                                 </div>
                               
+                                <div class="form-group col-sm-12">
+                                    <label for="description">Description <span class="text-danger">*</span></label>
+                                        <textarea id="summernote" name="description" data-plugin="summernote" data-air-mode="true">
+                                            
+                                        </textarea>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -71,8 +73,22 @@
 @section('scripts')
     <script src="{{ asset('assets/vendors/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="{{ asset('assets/vendors/bootstrap-timepicker/js/bootstrap-timepicker.min.js') }}"></script>
-    
+    <script src="{{ asset('assets/vendors/summernote/dist/summernote.min.js') }}"></script>
     <script>
+        // Bootstrap datepicker
+            $('#date_1 .input-group.date').datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true,
+                format: 'yyyy-mm-dd'
+            });
+    
+        $(function() {
+            $('#summernote').summernote();
+        });
+
         $(document).ready(function () {
             $('.budget').keyup(function(e){
                 if (/\D/g.test(this.value)){

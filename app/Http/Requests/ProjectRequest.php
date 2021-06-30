@@ -25,7 +25,7 @@ class ProjectRequest extends FormRequest
         if($this->method() == 'PATCH'){
             return [
                 'title' => 'required',
-                'description' => 'required',
+                // 'description' => 'required',
                 'client_name' => 'required',
                 'budget' => 'required|digits_between:3,10',
                 'deadline' => 'required'
@@ -33,7 +33,7 @@ class ProjectRequest extends FormRequest
         }else{
             return [
                 'title' => 'required',
-                'description' => 'required',
+                // 'description' => 'required',
                 'client_name' => 'required',
                 'budget' => 'required|digits_between:3,10',
                 'deadline' => 'required'
@@ -44,7 +44,7 @@ class ProjectRequest extends FormRequest
     public function messages(){
         return [
             'title.required' => 'Please Enter Project Title',
-            'description.required' => 'Please Enter Project Description',
+            // 'description.required' => 'Please Enter Project Description',
             'client_name.required' => 'Please Enter Client Name',
             'budget.required' => 'Please Enter Budget',
             'deadline.required' => 'Please Select Dead Line',

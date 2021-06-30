@@ -65,7 +65,7 @@
         /** insert */
             public function insert(ProjectRequest $request){
                 if($request->ajax()){ return true; }
-
+                dd($request->all());
                 if(!empty($request->all())){
                     $crud = [
                             'title' => ucfirst($request->title),
@@ -192,30 +192,17 @@
                     $id = base64_decode($request->id);
                     $status = $request->status;
 
-                    $data = Inventory::where(['id' => $id])->first();
+                    $data = Project::where(['id' => $id])->first();
 
                     if(!empty($data)){
                         if($status == 'deleted')
-                            $update = Inventory::where(['id' => $id])->delete();
+                            $update = Project::where(['id' => $id])->delete();
                         else
-                            $update = Inventory::where(['id' => $id])->update(['status' => $status, 'updated_at' => date('Y-m-d H:i:s'), 'updated_by' => auth()->user()->id]);
+                            $update = Project::where(['id' => $id])->update(['status' => $status, 'updated_at' => date('Y-m-d H:i:s'), 'updated_by' => auth()->user()->id]);
                         
                         if($update){
-                            InventoryDetail::where(['inventory_id' => $id])->delete();
-
-                            $exst_qrcode = public_path().'/uploads/qrcodes/'.$data->qrcode;
-                            $exst_file = public_path().'/uploads/inventory/'.$data->image;
-
-                            if(\File::exists($exst_qrcode) && $exst_qrcode != '')
-                                @unlink($exst_qrcode);
-
-                            if(\File::exists($exst_file) && $exst_file != '')
-                                @unlink($exst_file);
-                            
                             return response()->json(['code' => 200]);
                         }else{
-                            InventoryDetail::where(['inventory_id' => $id])->update(['status' => $status, 'updated_at' => date('Y-m-d H:i:s'), 'updated_by' => auth()->user()->id]);
-                            
                             return response()->json(['code' => 201]);
                         }
                     }else{

@@ -25,6 +25,7 @@ Route::group(['middleware' => ['prevent-back-history']], function(){
             Route::get('projects/edit', 'ProjectController@edit')->name('projects.edit');
             Route::post('projects/update', 'ProjectController@update')->name('projects.update');
             Route::get('projects/view', 'ProjectController@view')->name('projects.view');
+            Route::post('projects/change_status', 'ProjectController@change_status')->name('projects.change_status');
             Route::any('projects/milestone/{id?}', 'ProjectController@milestone')->name('projects.milestone');
         /** Projects */ 
             
@@ -32,6 +33,11 @@ Route::group(['middleware' => ['prevent-back-history']], function(){
             Route::any('milestones', 'MilestoneController@index')->name('milestones');
             Route::any('milestones/create/{id?}', 'MilestoneController@create')->name('milestones.create');
             Route::post('milestones/insert', 'MilestoneController@insert')->name('milestones.insert');
+            Route::get('milestones/view', 'MilestoneController@view')->name('milestones.view');
+            Route::get('milestones/edit/{id?}', 'MilestoneController@edit')->name('milestones.edit');
+            Route::PATCH('milestones/update', 'MilestoneController@update')->name('milestones.update');
+            Route::post('milestones/change_status', 'MilestoneController@change_status')->name('milestones.change_status');
+            Route::post('milestones/payment_change_status', 'MilestoneController@payment_change_status')->name('milestones.payment_change_status');
         /** Milestone */ 
     });
     Route::get("{path}", function(){ return redirect()->route('login'); })->where('path', '.+');

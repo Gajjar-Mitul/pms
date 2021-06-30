@@ -118,5 +118,31 @@
                 });
             }
         });
+        function change_status(object){
+            var id = $(object).data("id");
+            var status = $(object).data("status");
+            var msg = "Are you Sure?";
+
+            if (confirm(msg)) {
+                $.ajax({
+                    "url": "{!! route('projects.change_status') !!}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data":{
+                        id: id,
+                        status: status,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                            datatable.ajax.reload();
+                            toastr.success('Record status changed successfully.', 'Success');
+                        }else{
+                            toastr.error('Failed to delete record.', 'Error');
+                        }
+                    }
+                });
+            }
+        }
     </script>
 @endsection

@@ -39,17 +39,7 @@
     </div>
     
     @include('layout.scripts')
-    <script>
-        // Bootstrap datepicker
-            $('#date_1 .input-group.date').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true,
-                format: 'yyyy-mm-dd'
-            });
-    </script>
+    
 </body>
 
 </html>

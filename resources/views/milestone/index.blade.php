@@ -29,7 +29,8 @@
                                     <th>Name</th>
                                     <th>Amount</th>
                                     <th>DeadLine</th>
-                                    <th>Status</th>
+                                    <th>Work Status</th>
+                                    <th>Payment Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -105,6 +106,10 @@
                             name: 'status'
                         },
                         {
+                            data: 'payment_status',
+                            name: 'payment_status'
+                        },
+                        {
                             data: 'action',
                             name: 'action',
                             orderable: false,
@@ -113,5 +118,58 @@
                 });
             }
         });
+        function change_status(object){
+            var id = $(object).data("id");
+            var status = $(object).data("status");
+            var msg = "Are you Sure?";
+
+            if (confirm(msg)) {
+                $.ajax({
+                    "url": "{!! route('milestones.change_status') !!}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data":{
+                        id: id,
+                        status: status,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                            datatable.ajax.reload();
+                            toastr.success('Record status changed successfully.', 'Success');
+                        }else{
+                            toastr.error('Failed to delete record.', 'Error');
+                        }
+                    }
+                });
+            }
+        }
+
+        function payment_change_status(object){
+            var id = $(object).data("id");
+            var status = $(object).data("status");
+            var msg = "Are you Sure?";
+
+            if (confirm(msg)) {
+                $.ajax({
+                    "url": "{!! route('milestones.payment_change_status') !!}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data":{
+                        id: id,
+                        status: status,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response){
+                        if (response.code == 200){
+                            datatable.ajax.reload();
+                            toastr.success('Record status changed successfully.', 'Success');
+                        }else{
+                            toastr.error('Failed to delete record.', 'Error');
+                        }
+                    }
+                });
+            }
+        }
     </script>
 @endsection
